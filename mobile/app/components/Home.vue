@@ -16,10 +16,12 @@
 </template>
 
 <script>
+    import { Test } from '@/poc.js'
+
   export default {
     computed: {
       message() {
-        return "Blank {N}-Vue app";
+        return "TEST Count : " + Test()
       }
     }
   };

@@ -4,26 +4,22 @@
             <Label text="Home"/>
         </ActionBar>
 
-        <GridLayout>
-            <Label class="info">
-                <FormattedString>
-                    <Span class="fas" text.decode="&#xf135; "/>
-                    <Span :text="message"/>
-                </FormattedString>
-            </Label>
-        </GridLayout>
+        <ChatDebug />
     </Page>
 </template>
 
 <script>
-    import { Chat } from '@/poc.js'
+  import ChatDebug from '@/components/ChatDebug.vue'
+  //import { Chat } from '@/poc.js'
 
   export default {
     computed: {
       message() {
-        Chat()
-        return "TEST chat : "//Chat()
+        return "Home"
       }
+    },
+    components: {
+        ChatDebug
     }
   };
 </script>

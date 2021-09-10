@@ -16,10 +16,13 @@
 </template>
 
 <script>
+    import { Chat } from '@/poc.js'
+
   export default {
     computed: {
       message() {
-        return "Blank {N}-Vue app";
+        Chat()
+        return "TEST chat : "//Chat()
       }
     }
   };

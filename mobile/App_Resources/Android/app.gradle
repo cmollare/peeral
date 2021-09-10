@@ -10,7 +10,7 @@ configurations {
 }
 
 dependencies {
-  externalLibs files('libs/test.aar')
+  externalLibs files('libs/libp2p.aar')
 }
 
 // If you want to add something to be applied before applying plugins' include.gradle files

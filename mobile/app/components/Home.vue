@@ -16,12 +16,13 @@
 </template>
 
 <script>
-    import { Test } from '@/poc.js'
+    import { Chat } from '@/poc.js'
 
   export default {
     computed: {
       message() {
-        return "TEST Count : " + Test()
+        Chat()
+        return "TEST chat : "//Chat()
       }
     }
   };

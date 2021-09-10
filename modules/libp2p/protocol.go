@@ -16,12 +16,32 @@ import (
 
 const chatProtocol = protocol.ID("/libp2p/chat/1.0.0")
 
-func chatHandler(s network.Stream) {
+func (p *Peer) chatHandler(s network.Stream) {
 	data, err := ioutil.ReadAll(s)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		p.streamHandler.OnReceive(err.Error())
 	}
 	fmt.Println("Received:", string(data))
+	p.streamHandler.OnReceive(string(data))
+}
+
+// Send ...
+func (p *Peer) Send(msg string) {
+	for _, peer := range p.host.Network().Peers() {
+		if _, err := p.host.Peerstore().SupportsProtocols(peer, string(chatProtocol)); err == nil {
+			s, err := p.host.NewStream(p.ctx, peer, chatProtocol)
+			defer func() {
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
+			}()
+			if err != nil {
+				continue
+			}
+			err = chatSend(msg, s)
+		}
+	}
 }
 
 func chatSend(msg string, s network.Stream) error {
@@ -48,24 +68,12 @@ func chatSend(msg string, s network.Stream) error {
 	return nil
 }
 
-func chatInputLoop(ctx context.Context, h host.Host, donec chan struct{}) {
+func (p *Peer) chatInputLoop(ctx context.Context, h host.Host, donec chan struct{}) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		msg := scanner.Text()
-		for _, peer := range h.Network().Peers() {
-			if _, err := h.Peerstore().SupportsProtocols(peer, string(chatProtocol)); err == nil {
-				s, err := h.NewStream(ctx, peer, chatProtocol)
-				defer func() {
-					if err != nil {
-						fmt.Fprintln(os.Stderr, err)
-					}
-				}()
-				if err != nil {
-					continue
-				}
-				err = chatSend(msg, s)
-			}
-		}
+
+		p.Send(msg)
 	}
 	donec <- struct{}{}
 }

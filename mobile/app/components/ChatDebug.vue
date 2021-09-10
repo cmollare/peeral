@@ -7,9 +7,12 @@
 </template>
 
 <script>
+import { send, start, JSStreamHandler, lastMsg, subscribe } from '@/libp2p.js'
+
 export default {
   data() {
     return {
+      lastMsg: "",
       textReceived: "",
       textToSend: "Hello I'm nativescript node"
     }
@@ -17,6 +20,17 @@ export default {
   methods: {
     onButtonTap() {
       console.log(`send ${this.textToSend}`)
+      send(this.textToSend)
+    }
+  },
+  created() {
+    var handler = new JSStreamHandler()
+    start(handler)
+    subscribe(this)
+  },
+  watch: {
+    lastMsg: function(newVal) {
+      this.textReceived += newVal + "\n"
     }
   }
 }

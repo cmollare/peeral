@@ -18,6 +18,7 @@ import (
 	"github.com/libp2p/go-tcp-transport"
 	ws "github.com/libp2p/go-ws-transport"
 	"github.com/multiformats/go-multiaddr"
+	"peeral.com/proxy-libp2p/libp2p/interfaces"
 )
 
 type discoveryNotifee struct {
@@ -39,14 +40,15 @@ func (m *discoveryNotifee) HandlePeerFound(pi peer.AddrInfo) {
 
 // Peer ...
 type Peer struct {
-	ctx  context.Context
-	host host.Host
-	dht  *kaddht.IpfsDHT
+	ctx           context.Context
+	host          host.Host
+	dht           *kaddht.IpfsDHT
+	streamHandler interfaces.StreamHandler
 }
 
 // NewPeer ...
-func NewPeer() *Peer {
-	return &Peer{}
+func NewPeer(streamHandler interfaces.StreamHandler) *Peer {
+	return &Peer{streamHandler: streamHandler}
 }
 
 // Start ...
@@ -87,7 +89,7 @@ func (p *Peer) Start() {
 	}
 	p.host = host
 
-	host.SetStreamHandler(chatProtocol, chatHandler)
+	host.SetStreamHandler(chatProtocol, p.chatHandler)
 
 	for _, addr := range host.Addrs() {
 		fmt.Println("Listening on", addr)
@@ -140,9 +142,6 @@ func (p *Peer) ConnectToPeer(add string) {
 		notifee.HandlePeerFound(peer)
 	}
 
-	donec := make(chan struct{}, 1)
-	go chatInputLoop(p.ctx, p.host, donec)
-
 	/*stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT)
 
@@ -153,4 +152,10 @@ func (p *Peer) ConnectToPeer(add string) {
 	case <-donec:
 		(p.host).Close()
 	}*/
+}
+
+// StartInputLoop ...
+func (p *Peer) StartInputLoop() {
+	donec := make(chan struct{}, 1)
+	go p.chatInputLoop(p.ctx, p.host, donec)
 }

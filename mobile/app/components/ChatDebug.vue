@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { send, start, JSStreamHandler, lastMsg, subscribe } from '@/libp2p.js'
+import { send, connect, JSStreamHandler, lastMsg, subscribe } from '@/libp2p.js'
 
 export default {
   data() {
@@ -24,8 +24,8 @@ export default {
     }
   },
   created() {
-    var handler = new JSStreamHandler()
-    start(handler)
+    //var handler = new JSStreamHandler()
+    connect(null)
     subscribe(this)
   },
   watch: {

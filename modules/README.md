@@ -28,6 +28,6 @@ export ANDROID_NDK_HOME=/home/$USER/Android/Sdk/ndk/<ndk_version>=19>
 
 ```bash
 go get -d golang.org/x/mobile/cmd/gomobile
-gomobile bind -target=android peeral.com/proxy-libp2p/libp2p
+gomobile bind -target=android peeral.com/proxy-libp2p/libp2p peeral.com/proxy-libp2p/libp2p/interfaces
 ```
 (you can't build "main" package)

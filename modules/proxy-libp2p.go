@@ -6,13 +6,15 @@ import (
 )
 
 func main() {
-	sh := presentation.NewConsoleStreamHandler()
-	peer := libp2p.NewPeer(sh)
+	sh := presentation.NewConsoleCallbacks()
+	HostCb := presentation.NewCustomHostCallbacks()
+	peer := libp2p.NewPeer(HostCb, sh)
 
-	peer.Start()
-	peer.ConnectToPeer("")
+	peer.Connect()
+	peer.StartListening()
+	//peer.ConnectToPeer("")
 
-	peer.StartInputLoop()
+	//peer.StartInputLoop()
 
 	select {}
 }

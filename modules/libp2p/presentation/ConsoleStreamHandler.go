@@ -2,16 +2,35 @@ package presentation
 
 import "fmt"
 
-// ConsoleStreamHandler ...
-type ConsoleStreamHandler struct {
+// ConsoleCallbacks ...
+type ConsoleCallbacks struct {
 }
 
-// NewConsoleStreamHandler ...
-func NewConsoleStreamHandler() *ConsoleStreamHandler {
-	return &ConsoleStreamHandler{}
+// NewConsoleCallbacks ...
+func NewConsoleCallbacks() *ConsoleCallbacks {
+	return &ConsoleCallbacks{}
 }
 
 // OnReceive ...
-func (c *ConsoleStreamHandler) OnReceive(s string) {
+func (c *ConsoleCallbacks) OnReceive(s string, err string) {
 	fmt.Printf("interface called %s\n", s)
+}
+
+// CustomHostCallbacks ...
+type CustomHostCallbacks struct {
+}
+
+// NewCustomHostCallbacks ...
+func NewCustomHostCallbacks() *CustomHostCallbacks {
+	return &CustomHostCallbacks{}
+}
+
+// OnListening Called when host starts to listen on adresses
+func (c *CustomHostCallbacks) OnListening(id string, err string) {
+
+}
+
+// OnPeersDiscovered Called when a discover process ends
+func (c *CustomHostCallbacks) OnPeersDiscovered(peersIds []string) {
+
 }

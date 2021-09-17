@@ -18,12 +18,9 @@ const chatProtocol = protocol.ID("/libp2p/chat/1.0.0")
 
 func (p *Peer) chatHandler(s network.Stream) {
 	data, err := ioutil.ReadAll(s)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		p.streamHandler.OnReceive(err.Error())
-	}
+
 	fmt.Println("Received:", string(data))
-	p.streamHandler.OnReceive(string(data))
+	p.onMessageReceived(string(data), err.Error())
 }
 
 // Send ...

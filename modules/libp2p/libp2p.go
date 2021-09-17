@@ -1,8 +1,10 @@
 package libp2p
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/host"
@@ -40,15 +42,94 @@ func (m *discoveryNotifee) HandlePeerFound(pi peer.AddrInfo) {
 
 // Peer ...
 type Peer struct {
-	ctx           context.Context
-	host          host.Host
-	dht           *kaddht.IpfsDHT
-	streamHandler interfaces.StreamHandler
+	ctx             context.Context
+	host            host.Host
+	dht             *kaddht.IpfsDHT
+	hostCallbacks   interfaces.HostCallbacks
+	streamCallbacks interfaces.StreamCallbacks
 }
 
 // NewPeer ...
-func NewPeer(streamHandler interfaces.StreamHandler) *Peer {
-	return &Peer{streamHandler: streamHandler}
+func NewPeer(hostCallbacks interfaces.HostCallbacks, streamCallbacks interfaces.StreamCallbacks) *Peer {
+	return &Peer{hostCallbacks: hostCallbacks, streamCallbacks: streamCallbacks}
+}
+
+// Connect Announce peer on IPFS DHT
+func (p *Peer) Connect() {
+
+	ctx := context.Background()
+	p.ctx = ctx
+
+	global := true
+	listenF := 0
+	var seed int64 = 0
+
+	// Make a host that listens on the given multiaddress
+	var bootstrapPeers []peer.AddrInfo
+	var globalFlag string
+	if global {
+		log.Println("using global bootstrap")
+		bootstrapPeers = IPFS_PEERS
+		globalFlag = " -global"
+	} else {
+		log.Println("using local bootstrap")
+		bootstrapPeers = getLocalPeerInfo()
+		globalFlag = ""
+	}
+	ha, err := p.makeRoutedHost(listenF, seed, bootstrapPeers, globalFlag)
+
+	p.host = ha
+	if err != nil {
+		log.Fatal(err)
+		p.onListenCallback("", err.Error())
+	}
+	p.onListenCallback(p.host.ID().Pretty(), "")
+
+	go p.discoverPeers()
+
+	/*ps, err := pubsub.NewGossipSub(p.ctx, p.host)
+	if err != nil {
+		panic(err)
+	}
+
+	topic, err := ps.Join("/peeral/test/1.0.0")
+	if err != nil {
+		panic(err)
+	}
+
+	// and subscribe to it
+	sub, err := topic.Subscribe()
+	if err != nil {
+		panic(err)
+	}
+
+	log.Printf("%s", sub)
+
+	peers := ps.ListPeers("/peeral/test/1.0.0")
+	for _, p := range peers {
+		log.Printf("PEERS FOUNDS %s", p)
+	}*/
+}
+
+// StartListening register listener on given protocole
+func (p *Peer) StartListening() {
+	p.host.SetStreamHandler("/echo/2.0.0", func(s network.Stream) {
+		log.Println("Got a new stream!")
+		if err := doEcho(p.streamCallbacks, s); err != nil {
+			log.Println(err)
+			s.Reset()
+		} else {
+			s.Close()
+		}
+	})
+}
+
+func doEcho(hdl interfaces.StreamCallbacks, s network.Stream) error {
+	buf := bufio.NewReader(s)
+	str, err := buf.ReadString('\n')
+
+	hdl.OnReceive(str, err.Error())
+	return err
 }
 
 // Start ...

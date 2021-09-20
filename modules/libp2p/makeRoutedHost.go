@@ -79,22 +79,6 @@ func (p *Peer) makeRoutedHost(listenPort int, randseed int64, bootstrapPeers []p
 		return nil, err
 	}
 
-	/*go func() {
-		log.Printf("START DISCOVERY")
-		routingDiscovery := disc.NewRoutingDiscovery(dht)
-		disc.Advertise(ctx, routingDiscovery, string(chatProtocol))
-		peers, err := disc.FindPeers(ctx, routingDiscovery, string(chatProtocol))
-		if err != nil {
-			panic(err)
-		}
-		var res []string
-		for _, peer := range peers {
-			log.Printf("NEW PEER DISCOVERED : %s\n", peer.ID)
-			res = append(res, peer.ID.Pretty())
-		}
-		p.onPeerDiscoveredCallback(res)
-	}()*/
-
 	// Build host multiaddress
 	hostAddr, _ := ma.NewMultiaddr(fmt.Sprintf("/ipfs/%s", routedHost.ID().Pretty()))
 

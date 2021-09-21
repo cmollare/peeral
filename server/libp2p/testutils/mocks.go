@@ -2,31 +2,45 @@ package testutils
 
 import "log"
 
-// MockHostCallbacks ...
+// MockHostCallbacks is a mock for host event callbacks
 type MockHostCallbacks struct {
 	OnListeningStub       func(string, string)
 	OnPeersDiscoveredStub func([]string)
 }
 
-func OnReceive(s string, err string) {
-
+// MockStreamCallbacks is a mock for message received event callbacks
+type MockStreamCallbacks struct {
+	OnReceiveStub func(s string, err string)
 }
 
-func (m *MockHostCallbacks) OnListening(peerId string, err string) {
+// OnReceive implements StreamCallbacks interface
+func (m *MockStreamCallbacks) OnReceive(s string, err string) {
+	if m.OnReceiveStub == nil {
+		m.OnReceiveStub = func(s string, err string) {
+			log.Printf("Message received %s\n", s)
+		}
+	}
+
+	m.OnReceiveStub(s, err)
+}
+
+// OnListening implements HostCallbacks interface
+func (m *MockHostCallbacks) OnListening(peerID string, err string) {
 	if m.OnListeningStub == nil {
-		m.OnListeningStub = func(peerId string, err string) {
+		m.OnListeningStub = func(peerID string, err string) {
 			if err != "" {
 				log.Printf("Error : %s\n", err)
 				return
 			}
-			log.Printf("Peer %s is listening\n", peerId)
+			log.Printf("Peer %s is listening\n", peerID)
 		}
 	}
 
-	m.OnListeningStub(peerId, err)
+	m.OnListeningStub(peerID, err)
 }
 
-func (m *MockHostCallbacks) OnPeersDiscovered(peersIds []string) {
+// OnPeersDiscovered implements HostCallbacks interface
+func (m *MockHostCallbacks) OnPeersDiscovered(peersIDs []string) {
 	if m.OnPeersDiscoveredStub == nil {
 		m.OnPeersDiscoveredStub = func(s []string) {
 			for _, p := range s {
@@ -35,5 +49,5 @@ func (m *MockHostCallbacks) OnPeersDiscovered(peersIds []string) {
 		}
 	}
 
-	m.OnPeersDiscoveredStub(peersIds)
+	m.OnPeersDiscoveredStub(peersIDs)
 }

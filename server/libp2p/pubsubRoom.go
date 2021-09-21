@@ -1,92 +1,105 @@
 package libp2p
 
 import (
-	"context"
 	"encoding/json"
-	"log"
 
-	"github.com/libp2p/go-libp2p-core/peer"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
 
 type ChatRoom struct {
 	// Messages is a channel of messages received from other peers in the chat room
-	Messages chan *ChatMessage
+	ExitEvent chan struct{}
 
-	ctx   context.Context
 	ps    *pubsub.PubSub
 	topic *pubsub.Topic
 	sub   *pubsub.Subscription
 
 	roomName string
-	self     peer.ID
-	nick     string
 }
 
 // JoinNetwork Join a pubsub topic a.k.a. a network
-func (p *Peer) JoinNetwork(networkName string) {
+func (p *Peer) JoinNetwork(networkName string) error {
 	ps, err := pubsub.NewGossipSub(p.ctx, p.host)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	topic, err := ps.Join("/peeral/test/1.0.0")
+	topic, err := ps.Join(networkName)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// and subscribe to it
 	sub, err := topic.Subscribe()
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	p.topic = topic
-	p.sub = sub
-
-	log.Printf("Connected to /peeral/test/1.0.0\n")
 
 	cr := &ChatRoom{
-		ctx:      p.ctx,
-		ps:       ps,
-		topic:    topic,
-		sub:      sub,
-		self:     p.host.ID(),
-		nick:     "sdfsfsdf",
-		roomName: "/peeral/test/1.0.0",
-		Messages: make(chan *ChatMessage, 128),
+		ps:        ps,
+		topic:     topic,
+		sub:       sub,
+		roomName:  networkName,
+		ExitEvent: make(chan struct{}, 1),
 	}
 
+	p.chatRooms = append(p.chatRooms, cr)
+
 	// start reading messages from the subscription in a loop
-	go cr.readLoop()
+	go p.readLoop(cr)
+
+	return nil
 }
 
 // ChatMessage gets converted to/from JSON and sent in the body of pubsub messages.
 type ChatMessage struct {
-	Message    string
-	SenderID   string
-	SenderNick string
+	ChatRoomName string
+	Message      string
+	SenderID     string
+	SenderNick   string
 }
 
 // readLoop pulls messages from the pubsub topic and pushes them onto the Messages channel.
-func (cr *ChatRoom) readLoop() {
+func (p *Peer) readLoop(cr *ChatRoom) {
 	for {
-		msg, err := cr.sub.Next(cr.ctx)
-		if err != nil {
-			close(cr.Messages)
+		select {
+		case <-cr.ExitEvent:
+			close(cr.ExitEvent)
 			return
+		default:
+			msg, err := cr.sub.Next(p.ctx)
+			if err != nil {
+				close(cr.ExitEvent)
+				return
+			}
+			// only forward messages delivered by others
+			if msg.ReceivedFrom == p.RoutedHost.PeerID {
+				continue
+			}
+			cm := new(ChatMessage)
+			err = json.Unmarshal(msg.Data, cm)
+			if err != nil {
+				p.onMessageReceived("", err.Error())
+				continue
+			}
+			// send valid messages to the callback
+			p.onMessageReceived(string(msg.Data), "")
 		}
-		// only forward messages delivered by others
-		if msg.ReceivedFrom == cr.self {
-			continue
-		}
-		cm := new(ChatMessage)
-		err = json.Unmarshal(msg.Data, cm)
-		if err != nil {
-			continue
-		}
-		// send valid messages onto the Messages channel
-		log.Printf("Message received %s\n", cm.Message)
-		//cr.Messages <- cm
 	}
+}
+
+// Send ...
+func (p *Peer) Send(msg string) {
+	for _, chatRoom := range p.chatRooms {
+		toSend := &ChatMessage{
+			Message:      msg,
+			SenderID:     p.RoutedHost.PeerID.Pretty(),
+			SenderNick:   p.RoutedHost.PeerID.Pretty(),
+			ChatRoomName: chatRoom.roomName,
+		}
+
+		jsonToSend, _ := json.Marshal(toSend)
+		chatRoom.topic.Publish(p.ctx, jsonToSend)
+	}
+
 }

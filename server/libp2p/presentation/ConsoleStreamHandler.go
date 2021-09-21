@@ -13,7 +13,7 @@ func NewConsoleCallbacks() *ConsoleCallbacks {
 
 // OnReceive ...
 func (c *ConsoleCallbacks) OnReceive(s string, err string) {
-	fmt.Printf("interface called %s\n", s)
+	fmt.Printf("callback called %s\n", s)
 }
 
 // CustomHostCallbacks ...

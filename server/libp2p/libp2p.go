@@ -2,14 +2,15 @@ package libp2p
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
-	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"peeral.com/proxy-libp2p/libp2p/interfaces"
 	"peeral.com/proxy-libp2p/libp2p/ipfshost"
 )
@@ -39,8 +40,8 @@ type Peer struct {
 	dht             *kaddht.IpfsDHT
 	hostCallbacks   interfaces.HostCallbacks
 	streamCallbacks interfaces.StreamCallbacks
-	topic           *pubsub.Topic
-	sub             *pubsub.Subscription
+
+	chatRooms []*ChatRoom
 }
 
 // NewPeer ...
@@ -96,6 +97,38 @@ func (p *Peer) ConnectToPeer(peerID string) error {
 	adr, err := p.dht.FindPeer(p.ctx, peerid)
 	return p.host.Connect(context.Background(), adr)
 
+}
+
+// ConnectToPeers Connect to a list of peers
+func (p *Peer) ConnectToPeers(peerIDs []string) ([]string, error) {
+	var wg sync.WaitGroup
+	var connectedIDs []string
+
+	for _, id := range peerIDs {
+		wg.Add(1)
+		go func(id string) {
+			defer wg.Done()
+
+			err := p.ConnectToPeer(id)
+			if err != nil {
+				return
+			}
+			connectedIDs = append(connectedIDs, id)
+
+		}(id)
+
+	}
+	wg.Wait()
+
+	if len(connectedIDs) == 0 {
+		return nil, errors.New("Unable to connect to any peer")
+	}
+
+	return connectedIDs, nil
+}
+
+func (p *Peer) GetPeerID() string {
+	return p.RoutedHost.PeerID.Pretty()
 }
 
 // StartInputLoop ...

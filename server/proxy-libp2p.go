@@ -18,7 +18,6 @@ func main() {
 	peer := libp2p.NewPeer(HostCb, sh)
 
 	peer.Connect()
-	//peer.StartListening()
 	peer.JoinNetwork("test")
 	//peer.ConnectToPeer("")
 

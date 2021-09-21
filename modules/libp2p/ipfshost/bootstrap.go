@@ -1,13 +1,10 @@
-package libp2p
+package ipfshost
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"sync"
 
 	"github.com/libp2p/go-libp2p-core/host"
@@ -18,6 +15,7 @@ import (
 )
 
 var (
+	// IPFS_PEERS IPFS peers adresses
 	IPFS_PEERS = convertPeers([]string{
 		"/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ",
 		"/ip4/104.236.179.241/tcp/4001/p2p/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM",
@@ -29,7 +27,6 @@ var (
 		"/ip6/2604:a880:800:10::4a:5001/tcp/4001/p2p/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64",
 		"/ip6/2a03:b0c0:0:1010::23:1001/tcp/4001/p2p/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd",
 	})
-	LOCAL_PEER_ENDPOINT = "http://localhost:5001/api/v0/id"
 )
 
 // IdOutput Borrowed from ipfs code to parse the results of the command `ipfs id`
@@ -39,31 +36,6 @@ type IdOutput struct {
 	Addresses       []string
 	AgentVersion    string
 	ProtocolVersion string
-}
-
-// quick and dirty function to get the local ipfs daemons address for bootstrapping
-func getLocalPeerInfo() []peer.AddrInfo {
-	resp, err := http.Get(LOCAL_PEER_ENDPOINT)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	var js IdOutput
-	err = json.Unmarshal(body, &js)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	for _, addr := range js.Addresses {
-		// For some reason, possibly NAT traversal, we need to grab the loopback ip address
-		if addr[0:8] == "/ip4/127" {
-			return convertPeers([]string{addr})
-		}
-	}
-	log.Fatalln(err)
-	return make([]peer.AddrInfo, 1) // not reachable, but keeps the compiler happy
 }
 
 func convertPeers(peers []string) []peer.AddrInfo {
@@ -97,18 +69,18 @@ func bootstrapConnect(ctx context.Context, ph host.Host, peers []peer.AddrInfo) 
 		wg.Add(1)
 		go func(p peer.AddrInfo) {
 			defer wg.Done()
-			defer log.Println(ctx, "bootstrapDial", ph.ID(), p.ID)
-			log.Printf("%s bootstrapping to %s", ph.ID(), p.ID)
+			//defer log.Println(ctx, "bootstrapDial", ph.ID(), p.ID)
+			//log.Printf("%s bootstrapping to %s", ph.ID(), p.ID)
 
 			ph.Peerstore().AddAddrs(p.ID, p.Addrs, peerstore.PermanentAddrTTL)
 			if err := ph.Connect(ctx, p); err != nil {
 				log.Println(ctx, "bootstrapDialFailed", p.ID)
-				log.Printf("failed to bootstrap with %v: %s", p.ID, err)
+				//log.Printf("failed to bootstrap with %v: %s", p.ID, err)
 				errs <- err
 				return
 			}
 			log.Println(ctx, "bootstrapDialSuccess", p.ID)
-			log.Printf("bootstrapped with %v", p.ID)
+			//log.Printf("bootstrapped with %v", p.ID)
 		}(p)
 	}
 	wg.Wait()

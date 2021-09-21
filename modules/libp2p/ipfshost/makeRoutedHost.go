@@ -1,11 +1,10 @@
-package libp2p
+package ipfshost
 
 import (
 	"context"
 	"crypto/rand"
 	"fmt"
 	"io"
-	"log"
 	mrand "math/rand"
 
 	"github.com/libp2p/go-libp2p"
@@ -21,9 +20,17 @@ import (
 	ma "github.com/multiformats/go-multiaddr"
 )
 
-// makeRoutedHost creates a LibP2P host with a random peer ID listening on the
+// RoutedHost structure
+type RoutedHost struct {
+	Dht          *dht.IpfsDHT
+	Host         host.Host
+	PeerID       peer.ID
+	HostAdresses []ma.Multiaddr
+}
+
+// MakeRoutedHost creates a LibP2P host with a random peer ID listening on the
 // given multiaddress. It will bootstrap using the provided PeerInfo.
-func (p *Peer) makeRoutedHost(listenPort int, randseed int64, bootstrapPeers []peer.AddrInfo, globalFlag string) (host.Host, error) {
+func MakeRoutedHost(listenPort int, randseed int64, bootstrapPeers []peer.AddrInfo) (*RoutedHost, error) {
 	// If the seed is zero, use real cryptographic randomness. Otherwise, use a
 	// deterministic randomness source to make generated keys stay the same
 	// across multiple runs
@@ -62,7 +69,6 @@ func (p *Peer) makeRoutedHost(listenPort int, randseed int64, bootstrapPeers []p
 
 	// Make the DHT
 	dht := dht.NewDHT(ctx, basicHost, dstore)
-	p.dht = dht
 
 	// Make the routed host
 	routedHost := rhost.Wrap(basicHost, dht)
@@ -86,10 +92,16 @@ func (p *Peer) makeRoutedHost(listenPort int, randseed int64, bootstrapPeers []p
 	// by encapsulating both addresses:
 	// addr := routedHost.Addrs()[0]
 	addrs := routedHost.Addrs()
-	log.Println("I can be reached at:")
+
+	var fullAddrs []ma.Multiaddr
 	for _, addr := range addrs {
-		log.Println(addr.Encapsulate(hostAddr))
+		fullAddrs = append(fullAddrs, addr.Encapsulate(hostAddr))
 	}
 
-	return routedHost, nil
+	return &RoutedHost{
+		Dht:          dht,
+		Host:         routedHost,
+		HostAdresses: fullAddrs,
+		PeerID:       routedHost.ID(),
+	}, nil
 }

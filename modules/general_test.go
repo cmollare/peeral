@@ -10,5 +10,4 @@ func TestNilCallbacksShouldNotCrash(t *testing.T) {
 
 	peer := libp2p.NewPeer(nil, nil)
 	peer.Connect()
-	peer.StartListening()
 }

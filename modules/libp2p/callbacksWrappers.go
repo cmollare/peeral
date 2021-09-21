@@ -1,6 +1,9 @@
 package libp2p
 
+import "log"
+
 func (p *Peer) onListenCallback(id string, err string) {
+	log.Printf("Host listening with ID %s\n", id)
 	if p.hostCallbacks == nil {
 		return
 	}

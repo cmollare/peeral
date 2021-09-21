@@ -2,7 +2,9 @@ package libp2p
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 
 	"context"
@@ -70,7 +72,18 @@ func (p *Peer) chatInputLoop(ctx context.Context, h host.Host, donec chan struct
 	for scanner.Scan() {
 		msg := scanner.Text()
 
-		p.Send(msg)
+		log.Println("SEND SOMETHING")
+
+		toSend := &ChatMessage{
+			Message:    msg,
+			SenderID:   "test",
+			SenderNick: "nickname",
+		}
+		jsonToSend, _ := json.Marshal(toSend)
+		p.topic.Publish(p.ctx, jsonToSend)
+		log.Printf("Message sent : %s\n", msg)
+
+		//p.Send(msg)
 	}
 	donec <- struct{}{}
 }

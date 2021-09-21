@@ -6,7 +6,7 @@ Feature: Discovery with IPFS DHT
 
     Scenario: Standard discovery
       Given a peer is connected
-      And has been for 5 seconds
+      And has been for 50 seconds
       When my peer is started
       Then it should start listening
       And it should find peers

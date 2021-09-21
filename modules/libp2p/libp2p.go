@@ -11,15 +11,13 @@ import (
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/routing"
-	disc "github.com/libp2p/go-libp2p-discovery"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
 	mplex "github.com/libp2p/go-libp2p-mplex"
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	tls "github.com/libp2p/go-libp2p-tls"
 	yamux "github.com/libp2p/go-libp2p-yamux"
-	"github.com/libp2p/go-libp2p/p2p/discovery/mdns"
 	"github.com/libp2p/go-tcp-transport"
 	ws "github.com/libp2p/go-ws-transport"
-	"github.com/multiformats/go-multiaddr"
 	"peeral.com/proxy-libp2p/libp2p/interfaces"
 )
 
@@ -47,6 +45,8 @@ type Peer struct {
 	dht             *kaddht.IpfsDHT
 	hostCallbacks   interfaces.HostCallbacks
 	streamCallbacks interfaces.StreamCallbacks
+	topic           *pubsub.Topic
+	sub             *pubsub.Subscription
 }
 
 // NewPeer ...
@@ -183,9 +183,21 @@ func (p *Peer) Close() {
 }
 
 // ConnectToPeer Connect to peer with given addr
-func (p *Peer) ConnectToPeer(add string) {
+func (p *Peer) ConnectToPeer(peerID string) error {
 
-	if add != "" {
+	peerid, err := peer.Decode(peerID)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// peerinfo := peer.AddrInfo{ID: peerid}
+	// make a new stream from host B to host A
+	// it should be handled on host A by the handler we set above because
+	// we use the same /echo/1.0.0 protocol
+	adr, err := p.dht.FindPeer(p.ctx, peerid)
+	return p.host.Connect(context.Background(), adr)
+
+	/*if add != "" {
 		targetAddr, err := multiaddr.NewMultiaddr(add)
 		if err != nil {
 			panic(err)

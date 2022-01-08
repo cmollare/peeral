@@ -7,6 +7,23 @@ This folder contains reusable go module for diverse purposes
 https://github.com/golang/go/wiki/Mobile#building-and-deploying-to-android
 https://pkg.go.dev/golang.org/x/mobile/cmd/gobind
 
+# Tests
+
+## Acceptance tests
+
+```bash
+go test ./...
+```
+
+## End to end tests
+
+e2e tests are meant to fully test the peeral lib.<br>
+The test run will take several minutes.
+
+```bash
+godog
+```
+
 # Compile to aar
 
 ## Install gomobile

@@ -4,22 +4,22 @@ import (
 	"peeral.com/proxy-libp2p/domain/services"
 )
 
-// ServerCmds server object
-type ServerCmds struct {
+// ServerHandler server object
+type ServerHandler struct {
 	serverService *services.ServerService
 }
 
-// NewServerCmds create new server service
-func NewServerCmds(server *services.ServerService) *ServerCmds {
-	return &ServerCmds{serverService: server}
+// NewServerHandler create new server service
+func NewServerHandler(server *services.ServerService) *ServerHandler {
+	return &ServerHandler{serverService: server}
 }
 
 // CreateServer create a server with following name
-func (p *ServerCmds) CreateServer(name string) error {
+func (p *ServerHandler) CreateServer(name string) error {
 	return p.serverService.CreateServer(name)
 }
 
 // ConnectToServer connect to an existing server
-func (p *ServerCmds) ConnectToServer(name string) error {
+func (p *ServerHandler) ConnectToServer(name string) error {
 	return p.serverService.JoinServer(name)
 }

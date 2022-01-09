@@ -14,6 +14,9 @@ type BaseTest struct {
 
 func setup() *BaseTest {
 	serverRepoMock := &mocks.IServerRepository{}
+
 	srvService := services.NewServerService(serverRepoMock)
-	return &BaseTest{api.NewServerHandler(srvService), api.NewUserHandler(), serverRepoMock}
+	userService := services.NewUserService(serverRepoMock)
+
+	return &BaseTest{api.NewServerHandler(srvService), api.NewUserHandler(userService), serverRepoMock}
 }

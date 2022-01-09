@@ -3,12 +3,16 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
+	"peeral.com/proxy-libp2p/api"
+	"peeral.com/proxy-libp2p/domain/services"
+	serverrepository "peeral.com/proxy-libp2p/infra/serverRepository"
 	"peeral.com/proxy-libp2p/libp2p"
 	"peeral.com/proxy-libp2p/libp2p/presentation"
 )
 
-func main() {
+func mainBis() {
 
 	target := flag.String("d", "", "target peer to dial")
 	flag.Parse()
@@ -32,4 +36,37 @@ func main() {
 	peer.StartInputLoop()
 
 	select {}
+}
+
+var (
+	apiHdl injection
+)
+
+type injection struct {
+	userHdl   *api.UserHandler
+	serverHdl *api.ServerHandler
+}
+
+func main() {
+	inject()
+	err := apiHdl.userHdl.Connect("login", "pwd")
+
+	if err != nil {
+		log.Printf("Unable to connect")
+		os.Exit(1)
+	}
+
+	log.Printf("Start loop")
+	select {}
+
+}
+
+func inject() {
+	serverRepo := serverrepository.NewServerRepository()
+
+	serverService := services.NewServerService(serverRepo)
+	userService := services.NewUserService(serverRepo)
+
+	apiHdl.serverHdl = api.NewServerHandler(serverService)
+	apiHdl.userHdl = api.NewUserHandler(userService)
 }

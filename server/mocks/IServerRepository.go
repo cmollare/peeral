@@ -9,6 +9,20 @@ type IServerRepository struct {
 	mock.Mock
 }
 
+// Connect provides a mock function with given fields: login, pwd
+func (_m *IServerRepository) Connect(login string, pwd string) error {
+	ret := _m.Called(login, pwd)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(login, pwd)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Create provides a mock function with given fields: name
 func (_m *IServerRepository) Create(name string) error {
 	ret := _m.Called(name)

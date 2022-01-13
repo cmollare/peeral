@@ -1,6 +1,9 @@
 package serverrepository
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
 var (
 	once     sync.Once
@@ -9,12 +12,13 @@ var (
 
 //ServerRepository ...
 type ServerRepository struct {
+	peerHost *peerHost
 }
 
 // NewServerRepository ...
 func NewServerRepository() *ServerRepository {
 	once.Do(func() {
-		instance = &ServerRepository{}
+		instance = &ServerRepository{peerHost: &peerHost{}}
 	})
 
 	return instance
@@ -22,7 +26,7 @@ func NewServerRepository() *ServerRepository {
 
 // Connect implementation of interface with libp2p
 func (s *ServerRepository) Connect(login string, pwd string) error {
-	return nil
+	return s.peerHost.connect(context.Background())
 }
 
 // Create implementation of interface with libp2p

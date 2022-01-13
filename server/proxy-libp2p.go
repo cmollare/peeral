@@ -48,6 +48,8 @@ type injection struct {
 }
 
 func main() {
+	//ctx := context.Background()
+
 	inject()
 	err := apiHdl.userHdl.Connect("login", "pwd")
 

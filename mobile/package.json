@@ -30,6 +30,7 @@
   "dependencies": {
     "@nativescript/core": "~7.1.0",
     "@nativescript/theme": "~2.3.0",
+    "nativescript-localize": "^4.2.2",
     "nativescript-vue": "~2.8.0"
   },
   "devDependencies": {

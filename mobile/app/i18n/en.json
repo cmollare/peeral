@@ -1,3 +1,8 @@
 {
-  "app.name": "peeral"
+  "app.name": "peeral",
+  "login": {
+    "loginLabel": "Login",
+    "pwdLabel": "Password"
+  },
+  "test": "lolen"
 }

@@ -1,5 +1,5 @@
 import Vue from "nativescript-vue";
-import { localize, androidLaunchEventLocalizationHandler } from "nativescript-localize";
+import { localize, androidLaunchEventLocalizationHandler } from '@nativescript/localize';
 import { on, launchEvent } from '@nativescript/core/application';
 
 import Login from "./pages/Login";

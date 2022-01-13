@@ -1,5 +1,9 @@
 <template>
   <StackLayout>
+    <Label :text="'login.loginLabel'|L" />
+    <TextField :text="login" hint="Login" />
+    <Label :text="'login.pwdLabel'|L" />
+    <TextField :text="pwd" secure />
   </StackLayout>
 </template>
 
@@ -8,9 +12,8 @@
 export default {
   data() {
     return {
-      lastMsg: "",
-      textReceived: "",
-      textToSend: "Hello I'm nativescript node"
+      login: "",
+      pwd: ""
     }
   }
 }

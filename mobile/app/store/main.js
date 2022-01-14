@@ -4,9 +4,14 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    lastMessage: ""
+    currentMessage: ""
   },
   mutations: {
+  },
+  actions: {
+    parseCurrentMessage({ commit }) {
+      
+    }
   }
 });
 

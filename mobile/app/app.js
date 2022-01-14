@@ -2,6 +2,7 @@ import Vue from "nativescript-vue";
 import { localize, androidLaunchEventLocalizationHandler } from '@nativescript/localize';
 import { on, launchEvent } from '@nativescript/core/application';
 import Vuex from 'vuex';
+
 Vue.use(Vuex);
 
 import Login from "./pages/Login";

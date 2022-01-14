@@ -4,7 +4,8 @@
     <TextField :text="login" hint="Login" />
     <Label :text="'login.pwdLabel'|L" />
     <TextField :text="pwd" secure />
-    <Button text="Login" @tap="onButtonTap" style="background-color: gray" />
+    <Button text="Login" @tap="onButtonTap" />
+    <Label class="fas" text="fa-chess-knight | fonticon"></Label>
   </StackLayout>
 </template>
 
@@ -27,3 +28,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+button {
+    background-color: gray;
+    border-radius: 25%;
+}
+</style>

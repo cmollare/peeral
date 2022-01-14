@@ -1,9 +1,19 @@
 <template>
-  <StackLayout>
-    <TextView editable="false" :text=textReceived />
+  <FlexboxLayout flexDirection="column" alignContent="flex-end">
+    <Label textWrap="true">
+      <FormattedString>
+        <Span class="dot" text=" "/>
+        <Span text=" 0/1000" />
+      </FormattedString>
+    </Label>
+    <TextView editable="false" :text=textReceived flexGrow="80%"/>
     <TextField :text=textToSend />
-    <Button text="Send" @tap="onButtonTap" />
-  </StackLayout>
+    <Button className="graybutton" @tap="onButtonTap" wwwstyle="background-color: gray">
+      <FormattedString>
+        <Label class="fas" :text="'fa-bluetooth'"></Label> 
+      </FormattedString>
+    </Button>
+  </FlexboxLayout>
 </template>
 
 <script>
@@ -35,3 +45,17 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.dot {
+  height: 25px;
+  width: 25px;
+  background-color: #bbb;
+  border-radius: 50%;
+  /*display: inline-block;*/
+}
+
+.graybutton {
+  background-color: gray;
+}
+</style>

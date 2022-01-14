@@ -3,8 +3,9 @@
         <ActionBar>
             <Label text="Login"/>
         </ActionBar>
-
-        <Login />
+        <FlexboxLayout flexDirection="column-reverse" justifyContent="space-around">
+          <Login alignSelf="center" width="150" height="200" />
+        </FlexboxLayout>
     </Page>
 </template>
 

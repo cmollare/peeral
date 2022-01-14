@@ -31,7 +31,8 @@
     "@nativescript/core": "~7.1.0",
     "@nativescript/localize": "^5.0.4",
     "@nativescript/theme": "~2.3.0",
-    "nativescript-vue": "~2.8.0"
+    "nativescript-vue": "~2.8.0",
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "~7.1.0",

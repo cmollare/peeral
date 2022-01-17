@@ -12,13 +12,14 @@ var (
 
 //ServerRepository ...
 type ServerRepository struct {
+	ctx      context.Context
 	peerHost *peerHost
 }
 
 // NewServerRepository ...
-func NewServerRepository() *ServerRepository {
+func NewServerRepository(ctx context.Context) *ServerRepository {
 	once.Do(func() {
-		instance = &ServerRepository{peerHost: &peerHost{}}
+		instance = &ServerRepository{ctx: ctx, peerHost: &peerHost{ctx: ctx}}
 	})
 
 	return instance
@@ -26,7 +27,7 @@ func NewServerRepository() *ServerRepository {
 
 // Connect implementation of interface with libp2p
 func (s *ServerRepository) Connect(login string, pwd string) error {
-	return s.peerHost.connect(context.Background())
+	return s.peerHost.connect()
 }
 
 // Create implementation of interface with libp2p

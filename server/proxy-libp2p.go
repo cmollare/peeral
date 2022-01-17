@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"os"
@@ -64,7 +65,7 @@ func main() {
 }
 
 func inject() {
-	serverRepo := serverrepository.NewServerRepository()
+	serverRepo := serverrepository.NewServerRepository(context.Background())
 
 	serverService := services.NewServerService(serverRepo)
 	userService := services.NewUserService(serverRepo)

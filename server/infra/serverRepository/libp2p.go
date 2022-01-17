@@ -17,8 +17,7 @@ type peerHost struct {
 	hostAdresses []ma.Multiaddr
 }
 
-func (ph *peerHost) connect(ctx context.Context) error {
-	ph.ctx = ctx
+func (ph *peerHost) connect() error {
 
 	listenF := 0
 	var seed int64 = 0

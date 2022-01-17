@@ -1,14 +1,11 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
 	"os"
 
 	"peeral.com/proxy-libp2p/api"
-	"peeral.com/proxy-libp2p/domain/services"
-	serverrepository "peeral.com/proxy-libp2p/infra/serverRepository"
 	"peeral.com/proxy-libp2p/libp2p"
 	"peeral.com/proxy-libp2p/libp2p/presentation"
 )
@@ -64,10 +61,7 @@ func main() {
 }
 
 func inject() {
-	serverRepo := serverrepository.NewServerRepository(context.Background())
+	conf := api.NewConf()
 
-	serverService := services.NewServerService(serverRepo)
-	userService := services.NewUserService(serverRepo)
-
-	apiHdl.hdl = api.NewHandler(serverService, userService)
+	apiHdl.hdl = api.NewHandler(conf)
 }

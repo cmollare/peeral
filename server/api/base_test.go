@@ -17,5 +17,8 @@ func setup() *BaseTest {
 	srvService := services.NewServerService(serverRepoMock)
 	userService := services.NewUserService(serverRepoMock)
 
-	return &BaseTest{api.NewHandler(srvService, userService), serverRepoMock}
+	conf := api.NewConf()
+	conf.Inject(srvService, userService)
+
+	return &BaseTest{api.NewHandler(conf), serverRepoMock}
 }

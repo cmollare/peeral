@@ -9,6 +9,6 @@ type Handler struct {
 }
 
 // NewHandler create new server service
-func NewHandler(server *services.ServerService, userService *services.UserService) *Handler {
-	return &Handler{serverService: server, userService: userService}
+func NewHandler(conf *Conf) *Handler {
+	return &Handler{serverService: conf.serverService, userService: conf.userService}
 }

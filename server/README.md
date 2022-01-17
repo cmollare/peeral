@@ -9,7 +9,7 @@ https://pkg.go.dev/golang.org/x/mobile/cmd/gobind
 
 # Tests
 
-## Acceptance tests
+## Outside-in tests
 
 ```bash
 go test ./...

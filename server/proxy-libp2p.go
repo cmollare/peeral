@@ -44,15 +44,14 @@ var (
 )
 
 type injection struct {
-	userHdl   *api.UserHandler
-	serverHdl *api.ServerHandler
+	hdl *api.Handler
 }
 
 func main() {
 	//ctx := context.Background()
 
 	inject()
-	err := apiHdl.userHdl.Connect("login", "pwd")
+	err := apiHdl.hdl.Connect("login", "pwd")
 
 	if err != nil {
 		log.Printf("Unable to connect")
@@ -70,6 +69,5 @@ func inject() {
 	serverService := services.NewServerService(serverRepo)
 	userService := services.NewUserService(serverRepo)
 
-	apiHdl.serverHdl = api.NewServerHandler(serverService)
-	apiHdl.userHdl = api.NewUserHandler(userService)
+	apiHdl.hdl = api.NewHandler(serverService, userService)
 }

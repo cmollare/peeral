@@ -7,8 +7,7 @@ import (
 )
 
 type BaseTest struct {
-	serverHdl      *api.ServerHandler
-	userHdl        *api.UserHandler
+	handler        *api.Handler
 	serverRepoMock *mocks.IServerRepository
 }
 
@@ -18,5 +17,5 @@ func setup() *BaseTest {
 	srvService := services.NewServerService(serverRepoMock)
 	userService := services.NewUserService(serverRepoMock)
 
-	return &BaseTest{api.NewServerHandler(srvService), api.NewUserHandler(userService), serverRepoMock}
+	return &BaseTest{api.NewHandler(srvService, userService), serverRepoMock}
 }

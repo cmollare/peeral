@@ -4,14 +4,13 @@ export function subscribe(obj) {
   subscribe = obj
 }
 
-/*export var JSStreamHandler =  java.lang.Object.extend({
-      interfaces: [interfaces.StreamHandler],
-      onReceive: function(msg, err) {
-        console.log("received msg : " + msg)
-        subscribe.lastMsg = msg
-      }
-    })*/
-
+export var EventCallback = java.lang.Object.extend({
+  interfaces: [api.EventCallback],
+  Event: function(msg) {
+    console.log("received event "+msg)
+    subscribe.lastMsg = msg
+  }
+})
 
 var peer = null
 

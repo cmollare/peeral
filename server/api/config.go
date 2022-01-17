@@ -17,7 +17,7 @@ type Conf struct {
 
 //EventCallback inherite from this class to configure callback
 type EventCallback interface {
-	event(result string)
+	Event(result string)
 }
 
 // NewConf ...
@@ -37,7 +37,7 @@ func (c *Conf) SetContext(ctx context.Context) {
 
 // SetEventCallback event callback setter
 func (c *Conf) SetEventCallback(eventCb EventCallback) {
-	c.eventCb = eventCb.event
+	c.eventCb = eventCb.Event
 }
 
 //Inject injection function, will not be accessible from jar

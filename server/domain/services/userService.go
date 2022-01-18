@@ -1,6 +1,9 @@
 package services
 
-import "peeral.com/proxy-libp2p/domain/ports"
+import (
+	"peeral.com/proxy-libp2p/domain/models"
+	"peeral.com/proxy-libp2p/domain/ports"
+)
 
 //UserService ...
 type UserService struct {
@@ -14,5 +17,20 @@ func NewUserService(serverRepo ports.IServerRepository) *UserService {
 
 //Connect ...
 func (u UserService) Connect(login string, pwd string) error {
-	return u.serverRepo.Connect(login, pwd)
+	err := u.serverRepo.Connect(login, pwd)
+	if err != nil {
+		return err
+	}
+
+	err = u.serverRepo.Join("CustomRoom")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//SendMessage ...
+func (u UserService) SendMessage(message *models.MessageDto) error {
+	return u.serverRepo.SendMessage(message)
 }

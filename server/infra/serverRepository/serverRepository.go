@@ -2,7 +2,10 @@ package serverrepository
 
 import (
 	"context"
+	"log"
 	"sync"
+
+	"peeral.com/proxy-libp2p/domain/models"
 )
 
 var (
@@ -37,5 +40,10 @@ func (s *ServerRepository) Create(name string) error {
 
 // Join implementation of interface with libp2p
 func (s *ServerRepository) Join(name string) error {
+	return s.peerHost.joinChatRoom(name)
+}
+
+func (s *ServerRepository) SendMessage(message *models.MessageDto) error {
+	log.Fatal("Not Implemented")
 	return nil
 }

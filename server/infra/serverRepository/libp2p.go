@@ -7,6 +7,8 @@ import (
 	"github.com/libp2p/go-libp2p-core/host"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	ma "github.com/multiformats/go-multiaddr"
+	"peeral.com/proxy-libp2p/domain/models"
+	"peeral.com/proxy-libp2p/domain/singleton"
 	"peeral.com/proxy-libp2p/libp2p/ipfshost"
 )
 
@@ -36,8 +38,7 @@ func (ph *peerHost) connect() error {
 	//TODO : implement
 	go ph.discoverPeers()
 
-	return nil
+	singleton.LogEvent(models.NewLogData("Host listening with ID " + ph.host.ID().Pretty()))
 
-	//TODO : make callbacks
-	//p.onListenCallback(p.host.ID().Pretty(), "")
+	return nil
 }

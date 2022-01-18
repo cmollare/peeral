@@ -1,10 +1,13 @@
 package serverrepository
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/libp2p/go-libp2p-core/protocol"
 	disc "github.com/libp2p/go-libp2p-discovery"
+	"peeral.com/proxy-libp2p/domain/models"
+	"peeral.com/proxy-libp2p/domain/singleton"
 )
 
 const chatProtocol = protocol.ID("/libp2p/chat/1.0.0")
@@ -18,12 +21,12 @@ func (ph *peerHost) discoverPeers() []string {
 	}
 
 	peerList := ph.dht.RoutingTable().ListPeers()
-	log.Println(ph.ctx, "nb total peer ", len(peerList))
+	singleton.LogEvent(models.NewLogData(fmt.Sprintf("nb total peer %d", len(peerList))))
 
 	var res []string
-	log.Println(ph.ctx, "nb total peer ", len(peerList))
 	for _, peer := range peers {
 		res = append(res, peer.ID.Pretty())
+		//TODO : replace by logEvent
 		log.Println(ph.ctx, "peer Discovered ", peer.ID.Pretty())
 	}
 

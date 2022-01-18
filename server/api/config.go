@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 
 	"peeral.com/proxy-libp2p/domain/services"
 	serverrepository "peeral.com/proxy-libp2p/infra/serverRepository"
@@ -24,7 +25,7 @@ type EventCallback interface {
 func NewConf() *Conf {
 	conf := &Conf{ctx: context.Background()}
 	conf.eventCb = func(results string) {
-		println("Unimplemented event callback called with :\n%s", results)
+		log.Printf("Unimplemented event callback called with :\n%s", results)
 	}
 	conf.defaultInjection()
 	return conf
